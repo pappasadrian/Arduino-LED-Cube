@@ -81,7 +81,7 @@ void setup() {
   TCCR1B = 0;// same for TCCR1B
   TCNT1  = 0;//initialize counter value to 0
   // set timer count 
-  OCR1A = 10;// = (16*10^6) / ((DESIREDFREQUENCY)*8) - 1
+  OCR1A = 120;// = (16*10^6) / ((DESIREDFREQUENCY)*8) - 1
   // turn on CTC mode
   TCCR1B |= (1 << WGM12);
   // Set CS10 and CS12 bits for 1024 prescaler
