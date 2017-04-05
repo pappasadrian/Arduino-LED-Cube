@@ -211,9 +211,13 @@ void randomoff(int delaytime){
 
 //main loop - visualisation functions should be called here
 void loop() {
-  cyclepillars(200);
-  cycleleds(200);
-  randomon(200);
-  randomoff(200);
-  delay(1000);
+  int runspeed=200;
+  cyclepillars(runspeed);
+  delay(runspeed);
+  cycleleds(runspeed);
+  delay(runspeed);
+  randomon(runspeed);
+  delay(runspeed);
+  randomoff(runspeed);
+  delay(runspeed);
 }
