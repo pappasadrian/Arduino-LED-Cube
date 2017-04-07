@@ -322,6 +322,39 @@ void cyclecolumns(int delaytime){
   }
 }
 
+//pillars will consecutively light up circularly
+void pillarchase(int delaytime, int repetitions){
+  for (int count=0;count<repetitions;count++){
+    for (int x=1;x<numrows;x++){
+       pillaron(x,0);
+       bugfix();
+       delay(delaytime);
+       pillaroff(x,0);
+       bugfix();
+    }
+    for (int y=1;y<numcolumns;y++){
+       pillaron(numrows-1,y);
+       bugfix();
+       delay(delaytime);
+       pillaroff(numrows-1,y);
+       bugfix();
+    }
+    for (int x=1;x<numrows;x++){
+       pillaron(numrows-x-1,numcolumns-1);
+       bugfix();
+       delay(delaytime);
+       pillaroff(numrows-x-1,numcolumns-1);
+       bugfix();
+    }
+    for (int y=1;y<numcolumns;y++){
+       pillaron(0,numrows-y-1);
+       bugfix();
+       delay(delaytime);
+       pillaroff(0,numrows-y-1);
+       bugfix();
+    }
+  }
+}
 
 //main loop - visualisation functions should be called here
 void loop() {
@@ -343,5 +376,9 @@ void loop() {
   randomon(runspeed/2);
   delay(runspeed);
   randomoff(runspeed/2);
+  delay(runspeed);
+  pillaron(1,1);
+  pillarchase(runspeed/3,4);
+  pillaroff(1,1);
   delay(runspeed*5);
 }
