@@ -13,9 +13,9 @@ a,c,g,e are on the same column
 a,b,e,f are on the same layer
 a,c are on the same pillar
 */
-#define numlayers 2
-#define numrows 2
-#define numcolumns 2
+#define numlayers 3
+#define numrows 3
+#define numcolumns 3
 
 #define numleds numrows*numlayers*numcolumns
 
@@ -25,12 +25,13 @@ a,c are on the same pillar
 
 //pins that control individual "pillars" 
 int pillars[numrows][numcolumns] = {
-                 { 9, 10 },   
-                 { 11, 12 },  
+                 { 11, 13, 12},  
+                 { 8, 10, 9 },
+                 { 5, 7, 6},
               };
               
 //pins that control individual layers
-int layers[numlayers] = {6,7};
+int layers[numlayers] = {2, 3, 4};
 
 // 3-dimensional array onto which the current state of each LED is saved
 boolean cube[numrows][numcolumns][numlayers];
@@ -81,7 +82,7 @@ void setup() {
   TCCR1B = 0;// same for TCCR1B
   TCNT1  = 0;//initialize counter value to 0
   // set timer count 
-  OCR1A = 120;// = (16*10^6) / ((DESIREDFREQUENCY)*8) - 1
+  OCR1A = 90;// = (16*10^6) / ((DESIREDFREQUENCY)*8) - 1
   // turn on CTC mode
   TCCR1B |= (1 << WGM12);
   // Set CS10 and CS12 bits for 1024 prescaler
@@ -163,6 +164,11 @@ void ledoff(int x, int y, int z){
   cube[x][y][z]=false;
 }
 
+//randombug
+//some stuff will not work properly unless an external serial call is done
+//wtf - help
+void bugfix(){Serial.print(" ");}
+
 //turn each individual LED on and then off
 void cycleleds(int delaytime){
   for (int x=0;x<numrows;x++){
@@ -170,10 +176,11 @@ void cycleleds(int delaytime){
       for (int z=0;z<numlayers;z++){
         ledon(x,y,z);
         delay(delaytime);
-        cubestate();
+        //cubestate();
+        bugfix();
         ledoff(x,y,z);
-        delay(delaytime);
-        cubestate();
+        //delay(delaytime);
+        //cubestate();
       }
     }
   }
@@ -209,15 +216,132 @@ void randomoff(int delaytime){
   }
 }
 
+//turn all leds on
+void cubeon(){
+  for (int x=0;x<numrows;x++){
+    for (int y=0;y<numcolumns;y++){
+      for (int z=0;z<numlayers;z++){
+        ledon(x,y,z);
+      }
+    }
+  }
+}
+
+//turn all leds off
+void cubeoff(){
+  for (int x=0;x<numrows;x++){
+    for (int y=0;y<numcolumns;y++){
+      for (int z=0;z<numlayers;z++){
+        ledoff(x,y,z);
+      }
+    }
+  }
+}
+
+//turn a specified layer on
+void layeron(int sellayer){
+  for (int x=0;x<numrows;x++){
+    for (int y=0;y<numcolumns;y++){
+      ledon(x,y,sellayer);
+    }
+  } 
+}
+
+//turn a specified layer off
+void layeroff(int sellayer){
+  for (int x=0;x<numrows;x++){
+    for (int y=0;y<numcolumns;y++){
+      ledoff(x,y,sellayer);
+    }
+  } 
+}
+
+//cycle through all layers consecutively
+void cyclelayers(int delaytime){
+  for (int z=0;z<numlayers;z++){
+    layeron(z);
+    delay(delaytime);
+    layeroff(z);
+    //delay(delaytime);
+  }
+}
+
+//turn a specified row on
+void rowon(int selrow){
+  for (int x=0;x<numcolumns;x++){
+    for (int y=0;y<numlayers;y++){
+      ledon(selrow,x,y);
+    }
+  } 
+}
+
+//turn a specified row off
+void rowoff(int selrow){
+  for (int x=0;x<numcolumns;x++){
+    for (int y=0;y<numlayers;y++){
+      ledoff(selrow,x,y);
+    }
+  } 
+}
+
+//cycle through all rows consecutively
+void cyclerows(int delaytime){
+  for (int z=0;z<numlayers;z++){
+    rowon(z);
+    delay(delaytime);
+    rowoff(z);
+    //delay(delaytime);
+  }
+}
+
+//turn a specified column on
+void columnon(int selcolumn){
+  for (int x=0;x<numrows;x++){
+    for (int y=0;y<numlayers;y++){
+      ledon(x,selcolumn,y);
+    }
+  } 
+}
+
+//turn a specified column off
+void columnoff(int selcolumn){
+  for (int x=0;x<numrows;x++){
+    for (int y=0;y<numlayers;y++){
+      ledoff(x,selcolumn,y);
+    }
+  } 
+}
+
+//cycle through all columns consecutively
+void cyclecolumns(int delaytime){
+  for (int z=0;z<numcolumns;z++){
+    columnon(z);
+    delay(delaytime);
+    columnoff(z);
+    //delay(delaytime);
+  }
+}
+
+
 //main loop - visualisation functions should be called here
 void loop() {
   int runspeed=200;
+  cubeon();
+  delay(runspeed*2);
+  cubeoff();
+  delay(runspeed*2);
+  cyclerows(runspeed);
+  delay(runspeed);
+  cyclecolumns(runspeed);
+  delay(runspeed);
+  cyclelayers(runspeed);
+  delay(runspeed);
   cyclepillars(runspeed);
   delay(runspeed);
-  cycleleds(runspeed);
+  cycleleds(runspeed/2);
   delay(runspeed);
-  randomon(runspeed);
+  randomon(runspeed/2);
   delay(runspeed);
-  randomoff(runspeed);
-  delay(runspeed);
+  randomoff(runspeed/2);
+  delay(runspeed*5);
 }
